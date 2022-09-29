@@ -1,7 +1,6 @@
 ---
 -
  hosts: all
- become: false
  gather_facts: no
  tasks:
          - name: create a user called ahmed
@@ -9,4 +8,5 @@
                    name: user
                    state: present
                    comment: hello this is ahmed
+           become: true
 
