@@ -1,0 +1,36 @@
+---
+-
+ hosts: all
+ become: false
+ gather_facts: no
+ vars_files:
+         - mysql-users.yml
+ tasks:
+         - name: install mysql server
+           block:
+                   - yum:
+                           name: "{{item}}"
+                           state: "{{state | default('present' , 'omit')}}"
+                     loop:
+                             - mysql-server
+                     become: true                    
+         - name: enable and start mysql
+           service:
+                   name: mysqld.service
+                   state: "{{state | default('started')}}"
+                   enabled: yes
+           become: true
+         - name: create users
+           mysql_user:
+                   name: "{{item.0.username}}"
+                   password: "{{'hello_world' | b64encode | password_hash('sha512')}}"
+                   priv: '*.*:ALL'
+           when: "item.0.dept=='IT' and inventory_hostname in groups['lb_servers']"
+           loop: "{{users_access | subelements('db_list')}}"
+           become: true
+           tags: user
+
+
+
+
+
