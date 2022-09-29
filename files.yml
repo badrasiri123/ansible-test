@@ -1,0 +1,43 @@
+---
+-
+ hosts: all
+ become: false
+ gather_facts: no
+ vars_files:
+         - back/3_vars.yml
+         - users/user_dict.yml 
+ tasks:
+         - name: install softwares
+           yum:
+                   name: "{{backend_packages | flatten (levels=3) | list | mandatory}}"
+                   state: "{{state | default('present' , 'omit')}}"
+           become: true
+         - name: create "{{back_home}}"
+           file:
+                   path: "{{back_home}}"
+                   state: "{{state | default('directory' , 'omit')}}"
+                   owner: "{{item.key}}"
+                   group: "{{item.key}}"
+                   mode: '2755'
+           loop: "{{users | dict2items}}"
+           become: true
+           when: back_home is defined
+         - name: create "{{folders}}"
+           file:
+                   path: "{{back_home }} + item"
+                   state: touch
+           loop: "{{folders | flatten (levels=3)}}"
+           become: true
+         - name:  create users as required
+           user:
+                   name: "{{item.key}}"
+                   password: "{{'password' | b64encode | password_hash('sha512')}}"
+                   home: "{{back_home}}"
+           loop: "{{users | dict2items}}"
+           become: true
+           tags: users
+         
+
+                
+        
+
