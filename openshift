@@ -1,0 +1,47 @@
+#podman 
+#if the selinux is in enforing mode then you need to change the selinux file context type of the host's directory  
+semnaage fcontext -l | grep -i 'container_'
+semanage fcontext -a -t container_file_t '/var/dbfiles(/.*)'
+#create a container  
+podman run -d --name mydatabase -v /var/dbfiles:/var/mysql/test -p 30336:3306 -p 1202:3032 --pod new:mytestpod -e MYSQL_DATABASE=books -e MYSQL_PASSWORD=r3dh4t -e MYSQL_ROOT_PASSWORD=redhat123 registry.access.redhat.com/rhscl/mysql-56-rhel7
+# public regsiteries are configured by default in /etc/containers/registries.conf
+#podman login 
+podman login redhat.io
+# build an image
+podman build -t myimage --layers=false
+#list pods
+podman pod ps
+#list images
+podman images
+podman image ls
+#tag an image
+podman tag myimage myimage:3.6v
+#push an image 
+podman push <name of the image> docker.io/badrasiri/<name of the image with the tag>
+
+# open interactive terminal to co tnainer
+podman exec -it <name of the container>
+#list containers
+podman ps -a 
+# inspect a container 
+podman inspect mydatabase
+
+# login to openshift cluster
+oc login --username <username> --password <password>
+
+# create a new application with specific paramaters and a label
+oc new-app --name myapp --docker-image=mysql -e MYSQL_USER=Bader -e MYSQL_DATABASE=books -e MYSQL_PASSWORD=r3dh4t -e MYSQL_ROOT_PASSWORD=redhat123 -l app=mylabel
+# create a new deployment 
+oc create deployment mydep --image=nginx > mynewapp.yml --as-deployment-config=true
+# troubleshoot an application
+# if the application is in crashloopbackoff status that means the application keeps restarting there you'll have to troubleshoot the app.
+oc describe pod <name of the pod>
+oc get events 
+oc get pods -o wide 
+oc get deployments
+#edit a deployment
+oc edit deploy/mydep MYSQL_ROOT_PASSWORD=redhat
+
+
+
+
