@@ -2,6 +2,9 @@
 #if the selinux is in enforing mode then you need to change the selinux file context type of the host's directory  
 semnaage fcontext -l | grep -i 'container_'
 semanage fcontext -a -t container_file_t '/var/dbfiles(/.*)'
+# change the ownership of the directory 
+chown root:root /var/dbfiles
+
 #create a container  
 podman run -d --name mydatabase -v /var/dbfiles:/var/mysql/test -p 30336:3306 -p 1202:3032 --pod new:mytestpod -e MYSQL_DATABASE=books -e MYSQL_PASSWORD=r3dh4t -e MYSQL_ROOT_PASSWORD=redhat123 registry.access.redhat.com/rhscl/mysql-56-rhel7
 # public regsiteries are configured by default in /etc/containers/registries.conf
