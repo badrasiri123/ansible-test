@@ -44,6 +44,10 @@ oc get pods -o wide
 oc get deployments
 #edit a deployment
 oc edit deploy/mydep MYSQL_ROOT_PASSWORD=redhat
+#create a cm
+oc create cm mycm01 --from-file=testfile
+oc get cm 
+-------------------
 
 
 
