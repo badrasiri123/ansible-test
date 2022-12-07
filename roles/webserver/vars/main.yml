@@ -1,0 +1,5 @@
+---
+# vars file for webserver
+my_root_file: /var/www/html
+
+my_normal_file: index.html

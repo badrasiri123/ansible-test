@@ -1,0 +1,42 @@
+---
+-
+ hosts: all
+ become: true
+ gather_facts: yes
+ tasks:
+         - name: find the path
+           find:
+                   path: /opt
+                   recurse: yes
+           register: opt_files
+         - name: display opt var
+           debug:
+                   msg: "{{opt_files}}"
+         - name: set a mapping path
+           set_fact:
+                   mapping: "{{opt_files | map (attribute='path') | list}}"
+         - name: debug
+           debug:
+                   msg: "{{mapping}}"
+         - name: set a rel path
+           set_fact:
+                   relpath_root: "{{mapping | map('relpath' , mapping)}}"
+         - name: display result
+           debug:
+                   msg: "{{relpath_root}}"
+        
+
+         - name: display public or priv
+           set_fact:
+                   pub_or_priv: "{{ansible_facts.default_ipv4.address | quote}} is {{'Private' if (ansible_all_ipv4_addresses | ipaddr('private')) else (ansible_facts.default_ipv4.address | ipaddr('public')}}"
+         - name: result
+           debug:
+                   msg: "{{pub_or_priv}}"
+         - name: display ips with commas
+           set_fact:
+                   ip_addresses: "ipaddress={{groups['all'] | map('extract' , hostvars , ['ansible_all_ipv4_addresses']) | join(',')}}"
+         - name: display result
+           debug:
+                   msg: "{{ip_addresses}}"
+
+

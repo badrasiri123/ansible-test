@@ -1,0 +1,44 @@
+---
+-
+ hosts: all
+ become: true
+ vars_files:
+         - users-list.yml
+ tasks:
+         - name: transfer this list to dict
+           set_fact:
+                   userfirst: "{{users | items2dict (key_name='name' , value_name='first') | list}}"
+                   
+         - name: diplay the usersfirst
+           debug:
+                   msg: "{{userfirst}}"
+         - name: usermiddle
+           set_fact:
+                   usermiddle: "{{users | items2dict (key_name='name' , value_name='middle') | list}}"
+         - name: set last
+           set_fact:
+                   userlast: "{{users | items2dict (key_name='name' , value_name='last') | list}}"
+
+
+         - name: create first
+           user:
+                   name: "{{'userfirst'}}"
+                   state: present
+                   password: "{{lookup ('password' , 'password-' + 'userfirst' + ' length=6' , encrypt='sha512_crypt' , seed=100000) | password_hash('sha512' , 'salt')}}"
+           loop: "{{users}}"
+         - name: create first
+           user:
+                   name: "{{'usermiddle'}}"
+                   password: "{{lookup('password' , 'password-' + ('usermiddle') + ' length=6')) | password_hash('sha512' , 'salt')}}"
+                   state: absent
+           loop: "{{users}}"
+         - name: create middle
+           user:
+                   name: "{{userlast}}"
+                   password: "{{lookup ('password' , 'password-' + ('userlast' + ' length=6')) | password_hash('sha512' , 'salt')}}"
+                   state: absent
+           loop: "{{users}}"
+
+
+
+          

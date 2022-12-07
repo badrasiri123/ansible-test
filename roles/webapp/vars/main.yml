@@ -1,0 +1,4 @@
+---
+# vars file for webapp
+webapp_message: "welcome to the server of {{ansible_facts['hostname']}}"
+webapp_version: 3.3b

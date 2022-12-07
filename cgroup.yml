@@ -1,0 +1,7 @@
+---
+-
+ hosts: all
+ become: true
+ tasks:
+         - name: create cgroups
+           command: cgcreate -a bader:bader -t bader:bader -g cpuacct,memory,pids:ex447_stats

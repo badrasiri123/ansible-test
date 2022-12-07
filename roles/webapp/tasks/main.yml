@@ -1,0 +1,16 @@
+---
+# tasks file for webapp
+- name: send a message
+  copy:
+          content: "{{webapp_message}} and version{{webapp_version}}\n"
+          dest: /var/www/html/index.html
+- name: curl to it 
+  uri:
+          url: "http://{{lookup ('inventory_hostnames' , 'web_server')}}/index.html"
+          status_code: 200
+          return_content: yes
+  register: webresult
+- name: display the content
+  debug:
+          msg: "{{webresult}}"
+

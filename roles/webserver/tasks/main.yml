@@ -1,0 +1,24 @@
+---
+# tasks file for webserver
+- name: install webserver
+  yum:
+          name: httpd
+          state: "{{state | default(omit)}}"
+- name: enable it
+  service:
+          name: httpd
+          state: "{{state | default('started' , 'omit')}}"
+          enabled: yes
+- name: create index.html
+  file:
+          path: "{{my_root_file}}/{{my_normal_file}}"
+          state: touch
+- name: change the type of the file
+  sefcontext:
+          setype: httpd_sys_content_t
+          target: '/var/www/html/index.html(/.*)'
+          state: present
+  notify: restart httpd
+
+
+

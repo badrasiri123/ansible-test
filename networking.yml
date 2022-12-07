@@ -1,0 +1,56 @@
+---
+-
+ hosts: all
+ become: true
+ gather_facts: yes
+ vars_files:
+         - users-list.yml
+ tasks:
+         - name: set a fact
+           set_fact:
+
+                   joining: "{{groups['all']| map('extract' , hostvars , ['ansible_default_ipv4' , 'address']) | join (',')}}"
+         - name: display the join
+           debug:
+                   msg: "{{joining}}"
+         - name: set a rel path
+           set_fact:
+                   mapping: "{{groups['all'] | map('relpath' , '/etc')}}"
+         - name: if public or private ip
+           set_fact:
+                   ip_address: "{{ansible_default_ipv4.address | quote}} is {{'private' if (ansible_default_ipv4.address | ipaddr('private')) else 'public'}}"
+         - name: display results
+           debug:
+                   msg: "{{ip_address}}"
+         - name: select attr
+           set_fact:
+                   myusers: "{{users | selectattr('name' , 'defined') | selectattr('name' , 'equalto' , 'testusers') | list}}"
+         - name: debug a hostname
+           debug:
+
+                   msg: "{{lookup ('inventory_hostnames' , 'web_server')}}"
+         - name: creat test file
+           file:
+                   path: /opt/test
+                   state: touch
+         - name: use lineinfile
+           lineinfile:
+                   path: /opt/test
+                   regexp: '^theipaddr='
+                   line: "{{ansible_default_ipv4.address | quote}} is {{'private' if (ansible_default_ipv4.address | ipaddr('private')) else 'public'}} broadcast={{ansible_default_ipv4.address | ipaddr('netmask')}}"
+                   state: present
+         - name: add another of lists
+           lineinfile:
+                   path: /opt/test
+                   regexp: '^the_users='
+                   line: "the_users={{myusers}}"
+                   state: present
+
+
+
+
+
+
+
+
+

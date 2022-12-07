@@ -1,0 +1,33 @@
+---
+-
+ hosts: all
+ become: true
+ vars_files: users-list.yml
+ tasks:
+         - name: create name
+           user:
+                   name: "{{item.name}}"
+                   password: "{{lookup ('password' , 'password-' + item.name + ' length=6' , encrypt='sha512_crypt') | password_hash('sha512' , 'salt')}}"
+                   state: present
+           loop: "{{users}}"
+         - name: create first
+           user:
+                   name: "{{item.first}}"
+                   password: "{{lookup ('password' , 'password-' + item.first + ' length=6') | password_hash('sha512' , 'salt')}}"
+                   state: present
+           loop: "{{users}}"
+         - name: create middle
+           user:
+                   name: "{{item.middle}}"
+                   password: "{{lookup ('password' , 'password-' + item.middle + ' length=6') | password_hash('sha512' , 'salt')}}"
+                   state: present
+           loop: "{{users}}"
+         - name: create last
+           user:
+                   name: "{{item.last}}"
+                   password: "{{lookup ('password' , 'password-' + item.last + ' length=6') | password_hash('sha512' , 'salt')}}"
+                   state: present
+           loop: "{{users}}"
+           delegate_to: localhost
+
+
