@@ -1,0 +1,13 @@
+# go to badrasiri123 github account for playbooks and commands
+ansible-inventory -i inventory --list --yaml > converted_inventory.yml
+ansible-inventory -i inventory --list 
+ansible-inventory -i inventory --vars --graph 
+
+
+# interacting with tower api
+  curl -X POST --user myuser:mypassword http://localhost/api/v2/job_templates/'name of the template'/launch/
+
+# get the information from tower api
+  curl -X GET --user myuser:mypassword http://localhost/api/v2/job_templates/'name of the template'/ | json_pp -s -k 
+
+
